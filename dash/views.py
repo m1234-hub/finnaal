@@ -1,65 +1,65 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import View
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm
 
 
 
-
-#  User authetication Under Development #
-
-
-#from django.contrib import messages
-#from validate_email import validate_email
-#from django.contrib.auth.models import User
-# Create your views here.
+@login_required(login_url='login.html')
+def index(request):
+      return render(request, 'index.html')
 
 
-class RegistratiobView(View):
-    def get(self, request):
-      return render(request, 'register.html')
+def pricing (request):
+      return render(request, 'pricing.html')
 
 
- #   def post(self,request):
-        
-  #      context={
-   #        
-    #       'data': request.POST,
-     #      'has_error' : False
+def stockMarkets(request):
+      return render(request, 'stock-markets.html')
 
-       # }
-         
-
-      #  email=request.POST.get('email')
-       # password=request.POST.get('password')
-#        password1=request.POST.get('password1')
-
- #       if len(password)<6:
-  #         
-   #       messages.add_message(request, messages.ERROR, 'please provide a vailde email')
-    #      context['has_error']=True
-
-     #   if password!=password1:
-       ##   messages.add_message(request, messages.ERROR, 'please provide a vailde email')
-      #    context['has_error']=True
-
-        #if not validate_email(email):
-         #  messages.add_message(request, messages.ERROR, 'please provide a vailde email')
-          # context['has_error']=True
-     
-    
-        #if User.objects.filter(email=email).exist():
-         #  messages.add_message(request, messages.ERROR, 'please provide a vailde email')
-          # context['has_error']=True
-        
-        #if User.objects.filter(username=username).exist():
-         #  messages.add_message(request, messages.ERROR, 'please provide a vailde email')
-          # context['has_error']=True
-
-        #if context['has_error']:
-
-         #return render(request, 'register.html', context) 
-        
-        #User=User.objects.create_user(username)
-    
+def tradindViwe(request):
+      return render(request, 'trading-view.html')
 
 
-         
+#@login_required(login_url='login.html')
+def login_page( request):
+      page = 'login'
+      
+      if request.method == 'POST':
+            username = request.POST['username']
+            password = request.POST['password']
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                  login(request, user)
+                  
+                  return redirect('index')
+
+      return render(request, 'login.html', {'page': page})
+
+
+def logoutUser(request):
+      logout(request)
+      return redirect('login')
+
+def registerUser(request):
+      page = 'register'
+      form = CustomUserCreationForm()
+
+      if request.method == 'POST':
+            form = CustomUserCreationForm(request.POST)
+            if form.is_valid():
+                  user = form.save(commit=False)
+                  user.save()
+
+                  user = authenticate(request, username=user.username, password=request.POST['password1'])
+
+                  if user is not None:
+                        login(request,user)
+                        return redirect('index')
+
+
+      context = {'form': form, 'page':page }
+      return render(request, 'register.html', context)
