@@ -10,14 +10,19 @@ from .forms import CustomUserCreationForm
 def index(request):
       return render(request, 'index.html')
 
+@login_required(login_url='login.html')
+def base(request):
+      return render(request, 'basic-acc-mgt.html')
 
+@login_required(login_url='login.html')
 def pricing (request):
       return render(request, 'pricing.html')
 
-
+@login_required(login_url='login.html')
 def stockMarkets(request):
       return render(request, 'stock-markets.html')
 
+@login_required(login_url='login.html')
 def tradindViwe(request):
       return render(request, 'trading-view.html')
 
@@ -51,8 +56,11 @@ def registerUser(request):
       if request.method == 'POST':
             form = CustomUserCreationForm(request.POST)
             if form.is_valid():
+                  
                   user = form.save(commit=False)
+                 
                   user.save()
+                
 
                   user = authenticate(request, username=user.username, password=request.POST['password1'])
 
@@ -61,5 +69,5 @@ def registerUser(request):
                         return redirect('index')
 
 
-      context = {'form': form, 'page':page }
-      return render(request, 'register.html', context)
+      context = {'form': form, 'page': page} 
+      return render(request, 'register.html', context=context)
